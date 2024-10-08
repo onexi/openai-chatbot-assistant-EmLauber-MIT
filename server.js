@@ -28,12 +28,12 @@ const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY,
 });
 
-/*
+
 // Route to get the list of Assistants
 app.post('/api/assistants', async (req, res) => {
   let assistant_id = req.body.name;
   try {
-    let myAssistant = await openai.assistants.retrieve(assistant_id);
+    let myAssistant = await openai.beta.assistants.retrieve(assistant_id);
     console.log(myAssistant);
     res.json(myAssistant);
   } catch (error) {
@@ -41,8 +41,8 @@ app.post('/api/assistants', async (req, res) => {
     res.status(500).send('Error retrieving assistant');
   }
 });
-*/
 
+/*
 // OpenAI V2 API calls
 async function get_assistant(assistant_id) {
   try {
@@ -55,12 +55,13 @@ async function get_assistant(assistant_id) {
     return null;
   }
 }
+  */
 
-/*
+
 // Route to generate a new thread
 app.post('/api/threads', async (req, res) => {
   try {
-    let thread = await openai.threads.create({
+    let thread = await openai.beta.threads.create({
       assistant_id: state.assistant_id,
     });
     state.threadId = thread.id;
@@ -70,16 +71,17 @@ app.post('/api/threads', async (req, res) => {
     res.status(500).send('Error creating thread');
   }
 });
-*/
 
+/*
 // OpenAI V2 API Create a Thread 
 async function create_thread() {
   let response = await openai.beta.threads.create()
   state.thread_id = response.id;
   return response;
 }
-
+*/
 // OpenAI V2 API Create a Message
+/*
 async function run_agent() { 
   try {
     let thread_id = state.thread_id
@@ -112,13 +114,18 @@ async function run_agent() {
   app.listen(PORT, () => {
     console.log(`Server is running on port ${PORT}`);
   });
-/*
+*/
+
+
 // Route to add a message to the thread
 app.post('/api/messages', async (req, res) => {
   const { role, content } = req.body;
+  if (!content) {
+    return res.status(400).send('Missing required parameter: content');
+  }
   try {
     let message = await openai.messages.create({
-      thread_id: state.threadId,
+      threadid: state.threadId,
       role: role,
       content: content,
     });
@@ -134,7 +141,7 @@ app.post('/api/messages', async (req, res) => {
 app.post('/api/run', async (req, res) => {
   try {
     let run = await openai.runs.create({
-      thread_id: state.threadId,
+      threadid: state.threadId,
     });
     res.json(run);
   } catch (error) {
@@ -147,13 +154,17 @@ app.post('/api/run', async (req, res) => {
 app.get('/api/messages', async (req, res) => {
   try {
     let messages = await openai.messages.list({
-      thread_id: state.threadId,
+      threadid: state.threadId,
     });
-    res.json(messages);
+    let all_messages = get_all_messages(messages);
+    console.log(`Run Finished: ${JSON.stringify(all_messages)}`);
+    res.json(all_messages);
   } catch (error) {
     console.error(error);
     res.status(500).send('Error retrieving messages');
   }
 });
- */
-
+ 
+app.listen(PORT, () => {
+  console.log(`Server is running on port ${PORT}`);
+});

@@ -1,7 +1,7 @@
 {
   "name": "ps03openaiassistantchatbot",
   "version": "1.0.0",
-  "description": "",
+  "description": "[![Review Assignment Due Date](https://classroom.github.com/assets/deadline-readme-button-22041afd0340ce965d47ae6ef1cefeee28c7c493a6346c4f15d667ab976d596c.svg)](https://classroom.github.com/a/ZjtTJ8eb) # PS03OpenAIAssistantChatBot ### create a .env file and put in your OPENAI_API_KEY",
   "main": "server.js",
   "type": "module",
   "scripts": {
@@ -12,10 +12,13 @@
   "license": "MIT",
   "dependencies": {
     "body-parser": "^1.20.3",
+    "bootstrap": "^5.3.3",
     "cors": "^2.8.5",
     "dotenv": "^16.4.5",
+    "ejs": "^3.1.10",
     "express": "^4.21.0",
     "node-fetch": "^3.3.2",
     "openai": "^4.67.2"
-  }
+  },
+  "keywords": []
 }
