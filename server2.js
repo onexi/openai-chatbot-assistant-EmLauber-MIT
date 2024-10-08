@@ -10,9 +10,10 @@ const openai = new OpenAI({
 
 const app = express();
 const port = 3000;
+const assistant_id = 'asst_mKubPnoRJxz3sL90FRE9NEZH';
+const model_id = 'gpt-3.5-turbo';
 
-// const models = await openai.models.list();
-const Assistants = await openai.beta.assistants.retrieve('asst_mKubPnoRJxz3sL90FRE9NEZH');
+const Assistants = await openai.beta.assistants.retrieve(assistant_id);
     console.log(Assistants);
 
 
@@ -32,7 +33,7 @@ app.post('/run-assistant', async (req, res) => {
   try {
     // Step 1: Create a chat completion
     const completion = await openai.chat.completions.create({
-      model: assistant_id, // Typically something like "gpt-4" or "gpt-3.5-turbo"
+      model: model_id, // Typically something like "gpt-4" or "gpt-3.5-turbo"
       messages: [
         { role: 'system', content: 'You are an AI assistant.' },
         { role: 'user', content: user_prompt }
