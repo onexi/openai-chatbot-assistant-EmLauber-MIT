@@ -18,8 +18,8 @@ app.use(express.static('public')); // Serve static files from the 'public' direc
 
 // State dictionary
 let state = {
-  assistant_id: null,
-  assistant_name: null,
+  assistant_id: 'asst_mKubPnoRJxz3sL90FRE9NEZH',
+  assistant_name: 'BankTest',
   threadId: null,
   messages: [],
 };
