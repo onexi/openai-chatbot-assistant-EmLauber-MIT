@@ -42,7 +42,7 @@ app.post('/run-assistant', async (req, res) => {
     const completion = await openai.chat.completions.create({
       model: model_id, 
       messages: [
-        { role: 'system', content: 'You are an AI assistant.' },
+        { role: 'system', content: 'You are a helpful,respectful, chatbot and you provide information on banking products. You only answer questions about products for which you have details.' },
         { role: 'user', content: user_prompt }
       ]
     });
