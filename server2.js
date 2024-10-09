@@ -58,6 +58,7 @@ app.post('/run-assistant', async (req, res) => {
 
     // Step 3: Send response back to client
     res.json({ success: true, messages: state[assistant_id] });
+    console.log(state[assistant_id]);
 
   } catch (error) {
     console.error(error);
