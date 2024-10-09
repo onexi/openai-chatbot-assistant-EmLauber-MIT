@@ -31,35 +31,36 @@
   </div>
 
   <script>
-    document.getElementById('assistantForm').addEventListener('submit', async function(event) {
-      event.preventDefault();
+  document.getElementById('assistantForm').addEventListener('submit', async function(event) {
+    event.preventDefault();
 
-      const assistant_id = document.getElementById('assistant_id').value;
-      const user_prompt = document.getElementById('user_prompt').value;
+    const assistant_id = document.getElementById('assistant_id').value;
+    const user_prompt = document.getElementById('user_prompt').value;
 
-      const response = await fetch('/run-assistant', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ assistant_id, user_prompt })
-      });
-
-      const result = await response.json();
-
-      if (result.success) {
-        // Display the conversation
-        const chatWindow = document.getElementById('chatMessages');
-        chatWindow.innerHTML = '';  // Clear previous conversation
-
-        result.messages.forEach(message => {
-          const messageDiv = document.createElement('div');
-          messageDiv.textContent = `${message.role}: ${message.content}`;
-          messageDiv.style.color = message.role === 'user' ? 'lightgreen' : 'lightblue';
-          chatWindow.appendChild(messageDiv);
-        });
-      } else {
-        console.error(result.error);
-      }
+    const response = await fetch('/run-assistant', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ assistant_id, user_prompt })
     });
+
+    const result = await response.json();
+
+    if (result.success) {
+      // Display the conversation
+      const chatWindow = document.getElementById('chatMessages');
+      chatWindow.innerHTML = '';  // Clear previous conversation
+
+      result.messages.forEach(message => {
+        const messageDiv = document.createElement('div');
+        messageDiv.textContent = `${message.role === 'user' ? 'You' : 'Assistant'}: ${message.content}`;
+        messageDiv.style.color = message.role === 'user' ? 'lightgreen' : 'lightblue';
+        chatWindow.appendChild(messageDiv);
+      });
+    } else {
+      console.error(result.error);
+    }
+  });
+
   </script>
 </body>
 </html>

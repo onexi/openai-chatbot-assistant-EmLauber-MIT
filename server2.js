@@ -50,14 +50,21 @@ app.post('/run-assistant', async (req, res) => {
     const assistantResponse = completion.choices[0].message.content;
     console.log(completion.choices[0].message);
 
-    // Step 2: Update the state dictionary
+    // Store the conversation
+    const conversation = [
+      { role: 'user', content: user_prompt },
+      { role: 'assistant', content: assistantResponse }
+    ];
+
+    // Step 2: Update the state dictionary for this assistant
     state[assistant_id] = {
       user_prompt,
-      assistant_response: assistantResponse
+      assistant_response: assistantResponse,
+      conversation: conversation  // Store the entire conversation
     };
 
     // Step 3: Send response back to client
-    res.json({ success: true, messages: state[assistant_id] });
+    res.json({ success: true, messages: conversation });  // Send full conversation
     console.log(state[assistant_id]);
 
   } catch (error) {
