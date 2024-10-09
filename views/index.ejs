@@ -30,7 +30,7 @@
             <label for="user_prompt" class="form-label">Your Question</label>
             <input type="text" class="form-control" id="user_prompt" placeholder="Enter your question">
           </div>
-          <button type="submit" class="btn btn-primary w-100">Ask Assistant</button>
+          <button type="submit" class="btn btn-primary w-100" id="submitBtn">Ask Assistant</button>
         </form>
       </div>
 
@@ -52,35 +52,51 @@
 
       const assistant_id = document.getElementById('assistant_id').value;
       const user_prompt = document.getElementById('user_prompt').value;
+      const submitBtn = document.getElementById('submitBtn');
 
-      const response = await fetch('/run-assistant', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ assistant_id, user_prompt })
-      });
+      // Disable the button and change its appearance to show it's in progress
+      submitBtn.disabled = true;
+      submitBtn.textContent = 'Loading...';
 
-      const result = await response.json();
+      try {
+        const response = await fetch('/run-assistant', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ assistant_id, user_prompt })
+        });
 
-      if (result.success) {
-        // Get the chat window
-        const chatWindow = document.getElementById('chatMessages');
+        const result = await response.json();
 
-        // Append user message
-        const userMessageDiv = document.createElement('div');
-        userMessageDiv.textContent = `You: ${user_prompt}`;
-        userMessageDiv.style.color = 'lightgreen';
-        chatWindow.appendChild(userMessageDiv);
+        if (result.success) {
+          // Get the chat window
+          const chatWindow = document.getElementById('chatMessages');
 
-        // Append assistant response
-        const assistantMessageDiv = document.createElement('div');
-        assistantMessageDiv.textContent = `Assistant: ${result.messages[1].content}`;
-        assistantMessageDiv.style.color = 'lightblue';
-        chatWindow.appendChild(assistantMessageDiv);
+          // Append user message
+          const userMessageDiv = document.createElement('div');
+          userMessageDiv.textContent = `You: ${user_prompt}`;
+          userMessageDiv.style.color = 'lightgreen';
+          chatWindow.appendChild(userMessageDiv);
 
-        // Scroll to the latest message
-        chatWindow.scrollTop = chatWindow.scrollHeight;
-      } else {
-        console.error(result.error);
+          // Append assistant response
+          const assistantMessageDiv = document.createElement('div');
+          assistantMessageDiv.textContent = `Assistant: ${result.messages[1].content}`;
+          assistantMessageDiv.style.color = 'lightblue';
+          chatWindow.appendChild(assistantMessageDiv);
+
+          // Scroll to the latest message
+          chatWindow.scrollTop = chatWindow.scrollHeight;
+
+          // Clear the user input field
+          document.getElementById('user_prompt').value = '';
+        } else {
+          console.error(result.error);
+        }
+      } catch (error) {
+        console.error('Error communicating with the assistant:', error);
+      } finally {
+        // Re-enable the button and reset its appearance
+        submitBtn.disabled = false;
+        submitBtn.textContent = 'Ask Assistant';
       }
     });
   </script>
