@@ -10,18 +10,25 @@ const openai = new OpenAI({
 
 const app = express();
 const port = 3000;
-const assistant_id = 'asst_mKubPnoRJxz3sL90FRE9NEZH';
+// const assistant_id = 'asst_mKubPnoRJxz3sL90FRE9NEZH';
 const model_id = 'gpt-3.5-turbo';
 
-const Assistants = await openai.beta.assistants.retrieve(assistant_id);
-    console.log(Assistants);
+//const Assistants = await openai.beta.assistants.retrieve(assistant_id);
+//    console.log(Assistants);
 
 
 app.use(express.static('public'));
 app.use(express.json());
 app.set('view engine', 'ejs');
 
-let state = {};
+// State dictionary
+let state = {
+  assistant_id: null,
+  assistant_name: null,
+  threadId: null,
+  messages: [],
+};
+
 
 app.get('/', (req, res) => {
   res.render('index', { state });
@@ -33,7 +40,7 @@ app.post('/run-assistant', async (req, res) => {
   try {
     // Step 1: Create a chat completion
     const completion = await openai.chat.completions.create({
-      model: model_id, // Typically something like "gpt-4" or "gpt-3.5-turbo"
+      model: model_id, 
       messages: [
         { role: 'system', content: 'You are an AI assistant.' },
         { role: 'user', content: user_prompt }
@@ -41,6 +48,7 @@ app.post('/run-assistant', async (req, res) => {
     });
 
     const assistantResponse = completion.choices[0].message.content;
+    console.log(completion.choices[0].message);
 
     // Step 2: Update the state dictionary
     state[assistant_id] = {
@@ -56,6 +64,8 @@ app.post('/run-assistant', async (req, res) => {
     res.status(500).json({ success: false, error: error.message });
   }
 });
+
+
 
 app.listen(port, () => {
   console.log(`Server is running on http://localhost:${port}`);
