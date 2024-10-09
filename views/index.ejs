@@ -31,36 +31,43 @@
   </div>
 
   <script>
-  document.getElementById('assistantForm').addEventListener('submit', async function(event) {
-    event.preventDefault();
-
-    const assistant_id = document.getElementById('assistant_id').value;
-    const user_prompt = document.getElementById('user_prompt').value;
-
-    const response = await fetch('/run-assistant', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ assistant_id, user_prompt })
-    });
-
-    const result = await response.json();
-
-    if (result.success) {
-      // Display the conversation
-      const chatWindow = document.getElementById('chatMessages');
-      chatWindow.innerHTML = '';  // Clear previous conversation
-
-      result.messages.forEach(message => {
-        const messageDiv = document.createElement('div');
-        messageDiv.textContent = `${message.role === 'user' ? 'You' : 'Assistant'}: ${message.content}`;
-        messageDiv.style.color = message.role === 'user' ? 'lightgreen' : 'lightblue';
-        chatWindow.appendChild(messageDiv);
+    document.getElementById('assistantForm').addEventListener('submit', async function(event) {
+      event.preventDefault();
+  
+      const assistant_id = document.getElementById('assistant_id').value;
+      const user_prompt = document.getElementById('user_prompt').value;
+  
+      const response = await fetch('/run-assistant', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ assistant_id, user_prompt })
       });
-    } else {
-      console.error(result.error);
-    }
-  });
-
+  
+      const result = await response.json();
+  
+      if (result.success) {
+        // Get the chat window
+        const chatWindow = document.getElementById('chatMessages');
+  
+        // Append user message
+        const userMessageDiv = document.createElement('div');
+        userMessageDiv.textContent = `You: ${user_prompt}`;
+        userMessageDiv.style.color = 'lightgreen';
+        chatWindow.appendChild(userMessageDiv);
+  
+        // Append assistant response
+        const assistantMessageDiv = document.createElement('div');
+        assistantMessageDiv.textContent = `Assistant: ${result.messages[1].content}`;
+        assistantMessageDiv.style.color = 'lightblue';
+        chatWindow.appendChild(assistantMessageDiv);
+  
+        // Scroll to the latest message
+        chatWindow.scrollTop = chatWindow.scrollHeight;
+      } else {
+        console.error(result.error);
+      }
+    });
   </script>
+  
 </body>
 </html>
