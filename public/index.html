@@ -20,6 +20,13 @@
   <div class="container mt-5">
     <h1 class="text-center">AI Assistant Chat</h1>
     
+    <!-- Display Thread ID, Assistant ID, and Assistant Name -->
+    <div class="mb-3">
+      <strong>Thread ID:</strong> <span id="threadId">Not started</span> <br>
+      <strong>Assistant ID:</strong> <span id="assistantId">asst_mKubPnoRJxz3sL90FRE9NEZH</span> <br>
+      <strong>Assistant Name:</strong> <span id="assistantName">AI Assistant</span>
+    </div>
+
     <form id="assistantForm">
       <div class="mb-3">
         <button type="button" id="newThreadButton" class="btn btn-secondary">New Thread</button>
@@ -40,53 +47,68 @@
   </div>
 
   <script>
-    document.getElementById('assistantForm').addEventListener('submit', async function(event) {
-      event.preventDefault();
+  // Initial Assistant Info (hardcoded for now)
+  const assistantId = 'asst_mKubPnoRJxz3sL90FRE9NEZH';
+  const assistantName = 'AI Assistant';
 
-      const user_prompt = document.getElementById('user_prompt').value;
+  // Display Assistant ID and Name
+  document.getElementById('assistantId').textContent = assistantId;
+  document.getElementById('assistantName').textContent = assistantName;
 
-      const response = await fetch('/api/run', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ message: user_prompt })
-      });
+  document.getElementById('assistantForm').addEventListener('submit', async function(event) {
+    event.preventDefault();
 
-      const result = await response.json();
+    const user_prompt = document.getElementById('user_prompt').value;
 
-      if (result.messages) {
-        // Display the conversation
-        const chatWindow = document.getElementById('chatMessages');
-        chatWindow.innerHTML = '';  // Clear previous conversation
-
-        result.messages.forEach(message => {
-          const messageDiv = document.createElement('div');
-          messageDiv.textContent = `${message.role}: ${message.content}`;
-          messageDiv.style.color = message.role === 'user' ? 'lightgreen' : 'lightblue';
-          chatWindow.appendChild(messageDiv);
-        });
-      } else {
-        console.error(result.error);
-      }
-
-      // Clear input field
-      document.getElementById('user_prompt').value = '';
+    const response = await fetch('/api/run', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ message: user_prompt })
     });
 
-    document.getElementById('newThreadButton').addEventListener('click', async function() {
-      const response = await fetch('/api/threads', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({})
-      });
+    const result = await response.json();
 
-      const result = await response.json();
-      if (result.threadId) {
-        console.log('New thread created:', result.threadId);
-        document.getElementById('chatMessages').innerHTML = ''; // Clear chat window
-      } else {
-        console.error(result.error);
-      }
+    if (result.messages) {
+      // Display the conversation
+      const chatWindow = document.getElementById('chatMessages');
+      chatWindow.innerHTML = '';  // Clear previous conversation
+
+      result.messages.forEach(message => {
+        const messageDiv = document.createElement('div');
+        messageDiv.textContent = `${message.role}: ${message.content}`;
+        messageDiv.style.color = message.role === 'user' ? 'lightgreen' : 'lightblue';
+        chatWindow.appendChild(messageDiv);
+      });
+    } else {
+      console.error(result.error);
+    }
+
+    // Clear input field
+    document.getElementById('user_prompt').value = '';
+  });
+
+  document.getElementById('newThreadButton').addEventListener('click', async function() {
+    const response = await fetch('/api/threads', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({})
     });
-  </script>
+
+    const result = await response.json();
+    if (result.threadId) {
+      console.log('New thread created:', result.threadId);
+      document.getElementById('chatMessages').innerHTML = ''; // Clear chat window
+
+      // Update the thread ID on the page
+      document.getElementById('threadId').textContent = result.threadId;
+
+      // Ensure Assistant ID is displayed correctly
+      document.getElementById('assistantId').textContent = assistantId; // Just to ensure
+    } else {
+      console.error(result.error);
+    }
+  });
+</script>
+
 </body>
 </html>

@@ -20,7 +20,13 @@ let state = {
   threadId: null,
   messages: [],
   assistant_id: 'asst_mKubPnoRJxz3sL90FRE9NEZH',  // Assistant ID
+  assistantName: 'Bank Test',
 };
+
+// Route to get Assistant Info
+app.get('/api/assistant-info', (req, res) => {
+  res.json({ assistantId: state.assistant_id, assistantName: state.assistantName});
+});
 
 // Route to create a new Thread
 app.post('/api/threads', async (req, res) => {
