@@ -1,10 +1,25 @@
-/* styles.css */
 #chatWindow {
-    height: 300px;
-    overflow-y: scroll;
-    border: 1px solid #ccc;
-    background-color: #222;
-    color: #fff;
-    padding: 10px;
-  }
-  
+  height: 300px;
+  overflow-y: scroll;
+  border: 1px solid #ccc;
+  background-color: #222;
+  color: #fff;
+  padding: 10px;
+}
+
+/* Style for enabled buttons (blue background) */
+button {
+  background-color: blue;
+  color: white;
+}
+
+/* Style for disabled buttons (grey background) */
+button:disabled {
+  background-color: grey;
+  color: white;
+}
+
+/* New CSS for the assistant list */
+#assistantList li {
+  color: black; /* Set the text color to black */
+}
