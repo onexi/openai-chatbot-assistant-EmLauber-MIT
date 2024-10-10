@@ -1,0 +1,10 @@
+/* styles.css */
+#chatWindow {
+    height: 300px;
+    overflow-y: scroll;
+    border: 1px solid #ccc;
+    background-color: #222;
+    color: #fff;
+    padding: 10px;
+  }
+  
