@@ -1,7 +1,6 @@
 import express from 'express';
 import { OpenAI } from 'openai';
-
-import 'dotenv/config';  // Make sure to install dotenv: npm install dotenv
+import 'dotenv/config';  // Ensure you have dotenv installed: npm install dotenv
 
 const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY  // Use the environment variable
@@ -19,14 +18,9 @@ app.set('view engine', 'ejs');
 let state = {
   threadId: null,
   messages: [],
-  assistant_id: 'asst_mKubPnoRJxz3sL90FRE9NEZH',  // Assistant ID
-  assistantName: 'Bank Test',
+  assistant_id: 'asst_mKubPnoRJxz3sL90FRE9NEZH',  // Default Assistant ID
+  assistant_name: 'Default Assistant'  // Default Assistant Name
 };
-
-// Route to get Assistant Info
-app.get('/api/assistant-info', (req, res) => {
-  res.json({ assistantId: state.assistant_id, assistantName: state.assistantName});
-});
 
 // Route to create a new Thread
 app.post('/api/threads', async (req, res) => {
@@ -36,7 +30,7 @@ app.post('/api/threads', async (req, res) => {
     // Check if response is successful
     if (!response || response.object !== 'thread') {
       console.error('Error creating thread:', response);
-      return res.status(500).json({ error: 'Failed to create thread' }); // Use 500 status code for internal server error
+      return res.status(500).json({ error: 'Failed to create thread' });
     }
 
     // If successful, proceed with storing threadId
@@ -114,9 +108,48 @@ app.post('/api/run', async (req, res) => {
   }
 });
 
-// Route to get current thread state
+// Route to get the current thread state
 app.get('/api/state', (req, res) => {
   res.json({ threadId: state.threadId, messages: state.messages });
+});
+
+// Route to get the list of Assistants
+app.post('/api/assistants', async (req, res) => {
+  try {
+    const assistantsResponse = await openai.beta.assistants.list(); // Fetch the list of assistants
+    if (assistantsResponse.data && assistantsResponse.data.length > 0) {
+      res.status(200).json(assistantsResponse.data); // Send back the list of assistants
+    } else {
+      res.status(404).json({ error: 'No assistants found' });
+    }
+  } catch (error) {
+    console.error('Error fetching assistants:', error);
+    res.status(500).json({ error: 'Failed to fetch assistants' });
+  }
+});
+
+// Route to select an Assistant and update state
+app.post('/api/selectAssistant', async (req, res) => {
+  const { assistant_id } = req.body; // Expecting assistant_id in the request body
+
+  try {
+    const myAssistant = await openai.beta.assistants.retrieve(assistant_id); // Retrieve the assistant details
+    if (!myAssistant || myAssistant.error) {
+      return res.status(404).json({ error: 'Assistant not found' });
+    }
+
+    // Update the state with selected assistant information
+    state.assistant_id = myAssistant.id; 
+    state.assistant_name = myAssistant.name; 
+
+    // Reset messages for the new assistant
+    state.messages = []; 
+
+    res.status(200).json(state); // Send updated state back to the client
+  } catch (error) {
+    console.error('Error selecting assistant:', error);
+    res.status(500).json({ error: 'Failed to select assistant' });
+  }
 });
 
 // Start the server
