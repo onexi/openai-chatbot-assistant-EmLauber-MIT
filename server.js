@@ -1,6 +1,7 @@
 import express from 'express';
 import { OpenAI } from 'openai';
-import 'dotenv/config';  // Ensure dotenv is installed: npm install dotenv
+
+import 'dotenv/config';  // Make sure to install dotenv: npm install dotenv
 
 const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY  // Use the environment variable
@@ -69,6 +70,7 @@ app.post('/api/run', async (req, res) => {
     // Prepare the run request parameters
     const runRequest = {
       assistant_id: state.assistant_id,  // Ensure this is set correctly
+      instructions: 'Please respond to the user message',
     };
 
     // Run the assistant on the thread and poll for the result
@@ -76,10 +78,10 @@ app.post('/api/run', async (req, res) => {
     let run = await openai.beta.threads.runs.createAndPoll(state.threadId, runRequest);
 
     // Check if the run was successful and get messages
-    if (run && run.object === 'run') {
+    if (run.status === 'completed') {
       // List the messages in the thread
       let messagesResponse = await openai.beta.threads.messages.list(state.threadId);
-
+      
       // Update the state with all messages
       state.messages = messagesResponse.data;  // Update the state messages with the latest messages
 
