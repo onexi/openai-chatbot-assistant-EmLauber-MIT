@@ -20,23 +20,22 @@
   <div class="container mt-5">
     <h1 class="text-center">AI Assistant Chat</h1>
 
-    <!-- Assistant Info Section -->
-    <div class="mb-3">
-      <strong>Thread ID:</strong> <span id="threadId"></span><br>
-      <strong>Assistant ID:</strong> <span id="assistantId"></span><br>
-      <strong>Assistant Name:</strong> <span id="assistantName"></span>
+    <div id="assistantInfo" class="mb-3">
+      <p>Assistant ID: <span id="assistant_id" class="text-info">Not selected</span></p>
+      <p>Assistant Name: <span id="assistant_name" class="text-info">Not selected</span></p>
+      <p>Thread ID: <span id="thread_id" class="text-info">Not created</span></p>
     </div>
 
     <form id="assistantForm">
       <div class="mb-3">
+        <button type="button" id="selectAssistantButton" class="btn btn-secondary" enabled>Select Assistant</button>
         <button type="button" id="newThreadButton" class="btn btn-secondary" disabled>New Thread</button>
-        <button type="button" id="chooseAssistantButton" class="btn btn-secondary">Select Assistant</button>
       </div>
       <div class="mb-3">
         <label for="user_prompt" class="form-label">Your Question</label>
         <input type="text" class="form-control" id="user_prompt" placeholder="Enter your question" disabled>
       </div>
-      <button type="submit" class="btn btn-secondary" id="askAssistantButton" disabled>Ask Assistant</button>
+      <button type="submit" class="btn btn-secondary" disabled>Ask Assistant</button>
     </form>
 
     <div id="chatWindow" class="mt-5">
@@ -47,27 +46,28 @@
     </div>
   </div>
 
-  <!-- Modal for Choosing a Different Assistant -->
-  <div class="modal fade" id="assistantModal" tabindex="-1" aria-labelledby="assistantModalLabel" aria-hidden="true">
-    <div class="modal-dialog">
+  <!-- Modal for selecting an assistant -->
+  <div class="modal fade" id="assistantModal" tabindex="-1" role="dialog" aria-labelledby="assistantModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
       <div class="modal-content">
         <div class="modal-header">
-          <h5 class="modal-title" id="assistantModalLabel">Choose a Different Assistant</h5>
-          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          <h5 class="modal-title" id="assistantModalLabel">Select Assistant</h5>
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
         </div>
         <div class="modal-body">
-          <div id="assistantList">
-            <!-- Assistant options will be populated here -->
-          </div>
+          <ul id="assistantList"></ul> <!-- List of assistants -->
         </div>
         <div class="modal-footer">
-          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+          <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
         </div>
       </div>
     </div>
   </div>
 
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
-  <script src="script.js"></script> <!-- Include your script.js file -->
+  <script src="script.js"></script>
 </body>
 </html>

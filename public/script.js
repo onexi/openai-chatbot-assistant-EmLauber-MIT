@@ -1,125 +1,120 @@
-// script.js
-
-document.getElementById('assistantForm').addEventListener('submit', async function(event) {
-    event.preventDefault();
-
-    const user_prompt = document.getElementById('user_prompt').value;
-
-    // Disable the Ask Assistant button and show loading state
-    const askAssistantButton = document.getElementById('askAssistantButton');
-    askAssistantButton.textContent = 'Loading...';
-    askAssistantButton.disabled = true;
-
-    const response = await fetch('/api/run', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ message: user_prompt })
-    });
-
-    const result = await response.json();
-
-    if (result.messages) {
-        // Display the conversation
-        const chatWindow = document.getElementById('chatMessages');
-        chatWindow.innerHTML = '';  // Clear previous conversation
-
-        result.messages.forEach(message => {
-            const messageDiv = document.createElement('div');
-            messageDiv.textContent = `${message.role}: ${message.content}`;
-            messageDiv.style.color = message.role === 'user' ? 'lightgreen' : 'lightblue';
-            chatWindow.appendChild(messageDiv);
-        });
-    } else {
-        console.error(result.error);
-    }
-
-    // Clear input field and reset button
-    document.getElementById('user_prompt').value = '';
-    askAssistantButton.textContent = 'Ask Assistant';
-    askAssistantButton.disabled = false; // Re-enable the button
-});
-
-document.getElementById('newThreadButton').addEventListener('click', async function() {
-    // Disable the New Thread button while creating the thread
+// Function to update the assistant info displayed on the page
+function updateAssistantInfo(assistantId, assistantName) {
+    const assistantIdField = document.getElementById('assistant_id');
+    const assistantNameField = document.getElementById('assistant_name');
+    const threadIdField = document.getElementById('thread_id');
     const newThreadButton = document.getElementById('newThreadButton');
-    newThreadButton.disabled = true;
-
-    const response = await fetch('/api/threads', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({})
+    const askAssistantButton = document.querySelector('button[type="submit"]');
+  
+    // Update the assistant details on the webpage
+    assistantIdField.textContent = assistantId;
+    assistantNameField.textContent = assistantName;
+  
+    // Enable the New Thread button if assistant ID and name are populated
+    if (assistantId && assistantName) {
+      newThreadButton.disabled = false; // Enable the button
+      newThreadButton.classList.remove('btn-secondary');
+      newThreadButton.classList.add('btn-primary'); // Change to primary button style
+      askAssistantButton.disabled = true; // Disable Ask Assistant until a thread is created
+      document.getElementById('user_prompt').disabled = true; // Disable input until a thread is created
+    }
+  }
+  
+  // Function to handle the selection of an assistant from the modal
+  function selectAssistant(assistantId, assistantName) {
+    fetch('/api/selectAssistant', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ assistant_id: assistantId })
+    })
+      .then(response => response.json())
+      .then(data => {
+        updateAssistantInfo(data.assistant_id, data.assistant_name); // Update the assistant info on the page
+        closeModal(); // Close the modal after selection
+      })
+      .catch(error => console.error('Error selecting assistant:', error));
+  }
+  
+  // Function to handle the form submission for asking a question
+  document.getElementById('assistantForm').addEventListener('submit', async function(event) {
+    event.preventDefault();
+  
+    const user_prompt = document.getElementById('user_prompt').value;
+    const response = await fetch('/api/run', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ message: user_prompt })
     });
-
+  
+    const result = await response.json();
+  
+    if (result.messages) {
+      const chatWindow = document.getElementById('chatMessages');
+      chatWindow.innerHTML = ''; // Clear previous conversation
+  
+      result.messages.forEach(message => {
+        const messageDiv = document.createElement('div');
+        messageDiv.textContent = `${message.role}: ${message.content}`;
+        messageDiv.style.color = message.role === 'user' ? 'lightgreen' : 'lightblue';
+        chatWindow.appendChild(messageDiv);
+      });
+    } else {
+      console.error(result.error);
+    }
+  
+    // Clear input field
+    document.getElementById('user_prompt').value = '';
+  });
+  
+  // Function to handle new thread creation
+  document.getElementById('newThreadButton').addEventListener('click', async function() {
+    const response = await fetch('/api/threads', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({})
+    });
+  
     const result = await response.json();
     if (result.threadId) {
-        console.log('New thread created:', result.threadId);
-        document.getElementById('chatMessages').innerHTML = ''; // Clear chat window
-        
-        // Update the Thread ID display
-        document.getElementById('threadId').textContent = result.threadId;
-        
-        // Enable the Ask Assistant button after creating a thread
-        document.getElementById('askAssistantButton').disabled = false;
+      console.log('New thread created:', result.threadId);
+      document.getElementById('chatMessages').innerHTML = ''; // Clear chat window
+      document.getElementById('thread_id').textContent = result.threadId; // Update Thread ID display
+      document.querySelector('button[type="submit"]').disabled = false; // Enable Ask Assistant button
+      document.getElementById('user_prompt').disabled = false; // Enable user input
     } else {
-        console.error(result.error);
+      console.error(result.error);
     }
-
-    // Re-enable the New Thread button
-    newThreadButton.disabled = false;
-});
-
-document.getElementById('chooseAssistantButton').addEventListener('click', function() {
-    // Clear the assistant list before fetching new assistants
-    const assistantList = document.getElementById('assistantList');
-    assistantList.innerHTML = ''; // Clear previous options
-
-    // Fetch the list of assistants and populate the modal
+  });
+  
+  // Function to open the assistant selection modal and fetch assistants
+  document.getElementById('selectAssistantButton').addEventListener('click', function() {
     fetch('/api/assistants', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' }
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({})
     })
-    .then(response => {
-        if (!response.ok) {
-            throw new Error('Network response was not ok');
-        }
-        return response.json();
-    })
-    .then(data => {
-        data.forEach(assistant => {
-            const button = document.createElement('button');
-            button.className = 'btn btn-light m-1';
-            button.textContent = assistant.name; // Assuming assistant has a name property
-            button.onclick = async () => {
-                // Send selected assistant to server
-                const response = await fetch('/api/selectAssistant', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ assistant_id: assistant.id }) // Send assistant ID to server
-                });
-
-                if (response.ok) {
-                    const updatedState = await response.json();
-                    
-                    // Update Assistant ID and Name display on the webpage
-                    document.getElementById('assistantId').textContent = updatedState.assistant_id;
-                    document.getElementById('assistantName').textContent = updatedState.assistant_name;
-
-                    // Close the modal
-                    const modal = bootstrap.Modal.getInstance(document.getElementById('assistantModal'));
-                    modal.hide();
-                } else {
-                    console.error('Error selecting assistant:', await response.json());
-                }
-            };
-            assistantList.appendChild(button);
+      .then(response => response.json())
+      .then(assistants => {
+        const assistantList = document.getElementById('assistantList');
+        assistantList.innerHTML = ''; // Clear existing list
+  
+        assistants.forEach(assistant => {
+          const assistantItem = document.createElement('li');
+          assistantItem.textContent = assistant.name;
+          assistantItem.onclick = function() {
+            selectAssistant(assistant.id, assistant.name); // Select assistant on click
+          };
+          assistantList.appendChild(assistantItem);
         });
-    })
-    .catch(error => {
-        console.error('Error fetching assistants:', error);
-    });
-
-    // Show the modal
-    const modal = new bootstrap.Modal(document.getElementById('assistantModal'));
-    modal.show();
-});
-
+  
+        // Show the modal
+        $('#assistantModal').modal('show'); // Use jQuery to show the modal
+      })
+      .catch(error => console.error('Error fetching assistants:', error));
+  });
+  
+  // Function to close the modal
+  function closeModal() {
+    $('#assistantModal').modal('hide'); // Use jQuery to hide the modal
+  }
+  
