@@ -59,34 +59,43 @@ app.post('/api/run', async (req, res) => {
     console.log('Sending message to thread:', { role: "user", content: message });
     await openai.beta.threads.messages.create(state.threadId, {
       role: "user",
-      content: message,
+      content: message,  // Properly access content
     });
 
-    // Ensure the assistant_id is set before running
-    if (!state.assistant_id) {
-      return res.status(400).json({ error: "Missing required parameter: 'assistant_id'" });
-    }
+    // Log the thread state after sending the message
+    console.log('Current thread state:', state);
 
-    // Prepare the run request parameters
+    // Run the assistant on the thread
     const runRequest = {
-      assistant_id: state.assistant_id,  // Ensure this is set correctly
+      assistant_id: state.assistant_id, 
       instructions: 'Please respond to the user message',
     };
 
-    // Run the assistant on the thread and poll for the result
     console.log('Running assistant with runRequest:', runRequest);
     let run = await openai.beta.threads.runs.createAndPoll(state.threadId, runRequest);
 
-    // Check if the run was successful and get messages
+    // If the run is successful
     if (run.status === 'completed') {
-      // List the messages in the thread
       let messagesResponse = await openai.beta.threads.messages.list(state.threadId);
       
-      // Update the state with all messages
-      state.messages = messagesResponse.data;  // Update the state messages with the latest messages
+      // Log the received messages
+      console.log('Messages received from assistant:', messagesResponse.data);
 
-      // Log the assistant's response messages
-      console.log('Assistant run successful. Messages received:', state.messages);
+      // Update state and handle the content array
+      state.messages = messagesResponse.data.map(msg => {
+        let contentText = '';
+        if (msg.content && msg.content.length > 0 && msg.content[0].text) {
+          contentText = msg.content[0].text.value;  // Extract the text value
+        }
+        return { 
+          role: msg.role, 
+          content: contentText, 
+          createdAt: msg.created_at
+        };
+      });
+
+      // Log the extracted text for debugging
+      console.log('Processed messages with content:', state.messages);
 
       // Send the updated messages back to the client
       res.json({ messages: state.messages });
