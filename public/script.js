@@ -13,8 +13,8 @@ function updateAssistantInfo(assistantId, assistantName) {
     // Enable the New Thread button if assistant ID and name are populated
     if (assistantId && assistantName) {
       newThreadButton.disabled = false; // Enable the button
-      newThreadButton.classList.remove('btn-secondary');
-      newThreadButton.classList.add('btn-primary'); // Change to primary button style
+      // newThreadButton.classList.remove('btn-secondary');
+      // newThreadButton.classList.add('btn-primary'); // Change to primary button style
       askAssistantButton.disabled = true; // Disable Ask Assistant until a thread is created
       document.getElementById('user_prompt').disabled = true; // Disable input until a thread is created
     }
