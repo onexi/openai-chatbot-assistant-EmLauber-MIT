@@ -27,10 +27,24 @@ button:disabled {
   color: white;
 }
 
-/* New CSS for the assistant list */
-#assistantList li {
-  color: black; /* Set the text color to black */
+  /* Style for the assistant items in the modal */
+#assistantList .assistant-item {
+    padding: 10px;
+    background-color: #f8f9fa; /* Light background so the text stands out */
+    border: 1px solid #ccc;
+    margin-bottom: 5px;
+    cursor: pointer;
+    color: black; /* Ensure the text is always black */
 }
+
+/* Hover effect to change background or other effects, but keep text black */
+#assistantList .assistant-item:hover {
+    background-color: #e2e6ea; /* Slightly darker background on hover */
+    color: black; /* Keep the text black even on hover */
+}
+
+
+
   </style>
 </head>
 <body class="bg-dark text-light">
@@ -41,6 +55,22 @@ button:disabled {
       <p>Assistant ID: <span id="assistant_id" class="text-info">Not selected</span></p>
       <p>Assistant Name: <span id="assistant_name" class="text-info">Not selected</span></p>
       <p>Thread ID: <span id="thread_id" class="text-info">Not created</span></p>
+    </div>
+
+    <!-- Added text block describing how to use the webpage -->
+    <div id="usageInstructions" class="mb-3">
+      <h2>How to Use This Webpage</h2>
+      <p>To interact with an AI Assistant, follow these steps:</p>
+      <ol>
+        <li>Click "Select Assistant" to open a popup that lists all assistants available to you.</li>
+        <li>Click on the assistant name to select it.</li>
+        <li>Click "Close" to close the popup.</li>
+        <li>Click "New Thread" to create a new conversation thread with the selected assistant.</li>
+        <li>Enter your message in the input field.</li>
+        <li>Click the "Send" button to submit your message.</li>
+        <li>Wait for the assistant's response, which will appear in the chat window.</li>
+      </ol>
+      <p>If you encounter any issues, please refresh the page or try again later.</p>
     </div>
 
     <form id="assistantForm">
@@ -64,24 +94,25 @@ button:disabled {
   </div>
 
   <!-- Modal for selecting an assistant -->
-  <div class="modal fade" id="assistantModal" tabindex="-1" role="dialog" aria-labelledby="assistantModalLabel" aria-hidden="true">
-    <div class="modal-dialog" role="document">
-      <div class="modal-content">
-        <div class="modal-header">
-          <h5 class="modal-title" id="assistantModalLabel">Select Assistant</h5>
-          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-            <span aria-hidden="true">&times;</span>
-          </button>
-        </div>
-        <div class="modal-body">
-          <ul id="assistantList"></ul> <!-- List of assistants -->
-        </div>
-        <div class="modal-footer">
-          <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-        </div>
+<div class="modal fade" id="assistantModal" tabindex="-1" role="dialog" aria-labelledby="assistantModalLabel" aria-hidden="true">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="assistantModalLabel">Select Assistant</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <div id="assistantList"></div> <!-- Changed from <ul> to <div> -->
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
       </div>
     </div>
   </div>
+</div>
+
 
   <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>

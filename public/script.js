@@ -29,6 +29,7 @@ function updateAssistantInfo(assistantId, assistantName) {
     })
       .then(response => response.json())
       .then(data => {
+        
         updateAssistantInfo(data.assistant_id, data.assistant_name); // Update the assistant info on the page
         closeModal(); // Close the modal after selection
       })
@@ -97,19 +98,20 @@ function updateAssistantInfo(assistantId, assistantName) {
       .then(assistants => {
         const assistantList = document.getElementById('assistantList');
         assistantList.innerHTML = ''; // Clear existing list
-  
+    
         assistants.forEach(assistant => {
-          const assistantItem = document.createElement('li');
-          assistantItem.textContent = assistant.name;
-          assistantItem.onclick = function() {
-            selectAssistant(assistant.id, assistant.name); // Select assistant on click
-          };
-          assistantList.appendChild(assistantItem);
+            const assistantItem = document.createElement('div');
+            assistantItem.textContent = assistant.name;
+            assistantItem.classList.add('assistant-item'); // Add class for styling
+            assistantItem.onclick = function() {
+                selectAssistant(assistant.id, assistant.name); // Select assistant on click
+            };
+            assistantList.appendChild(assistantItem);
         });
-  
+    
         // Show the modal
         $('#assistantModal').modal('show'); // Use jQuery to show the modal
-      })
+    })
       .catch(error => console.error('Error fetching assistants:', error));
   });
   
